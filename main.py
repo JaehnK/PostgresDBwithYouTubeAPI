@@ -8,7 +8,7 @@ def main():
     
 
     # pprint(crawling_handler.get_channel_info(channel_info['leebonggyuTv']))
-    pprint(crawling_handler.get_channel_info('@sogunom'))
+    pprint(crawling_handler.get_channel_info('@MrBeast'))
     # pprint(crawling_handler.get_all_videos('@sogunom'))
 
 

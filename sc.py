@@ -123,7 +123,7 @@ class YTDLPCaptionCollector:
     def download_all_available_subtitles(self, video_url, output_dir="./captions"):
         """모든 사용 가능한 자막 다운로드"""
         return self.download_subtitles(
-            video_url, 
+             video_url, 
             output_dir, 
             languages=[], 
             auto_subs=True

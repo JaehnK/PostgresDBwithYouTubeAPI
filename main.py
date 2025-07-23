@@ -12,9 +12,9 @@ def main():
     # pprint(crawling_handler.get_all_videos('@sogunom'))
 
 
-    db = DataManager()
-    conn = db.connection.get_connection()
-    pprint(db.connection.get_connection_info())
+    # db = DataManager()
+    # conn = db.connection.get_connection()
+    # pprint(db.connection.get_connection_info())
     
     
 if __name__ == "__main__":

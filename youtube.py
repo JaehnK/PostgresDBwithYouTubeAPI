@@ -37,7 +37,7 @@ class YouTubeConfig:
     def __post_init__(self):
         """설정 초기화 및 검증"""
         if not self.api_key:
-            load_dotenv()
+            load_dotenv()   
             self.api_key = os.getenv('YOUTUBE_API_KEY', '')
         
         # 출력 디렉토리 생성

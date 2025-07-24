@@ -1,0 +1,88 @@
+from typing import Dict, Any
+import logging
+
+from .utils.YoutubeUtils import YouTubeUtils
+
+from .YouTubeConfig import YouTubeConfig
+from .YouTubeServiceFactory import YouTubeServiceFactory
+
+class YouTubeWorkflow:
+    """YouTube 작업 워크플로우 관리"""
+    
+    def __init__(self, config: YouTubeConfig):
+        self.config = config
+        self.factory = YouTubeServiceFactory(config)
+        self.logger = logging.getLogger(__name__)
+    
+    def process_single_video(self, video_url: str, options: Dict[str, Any] = None) -> Dict[str, Any]:
+        """단일 비디오 전체 처리"""
+        if options is None:
+            options = {}
+        
+        try:
+            # 비디오 ID 추출
+            video_id = YouTubeUtils.extract_video_id(video_url)
+            
+            # 서비스 생성
+            metadata_extractor = self.factory.create_metadata_extractor()
+            subtitle_manager = self.factory.create_subtitle_manager()
+            
+            # 메타데이터 추출
+            metadata = metadata_extractor.extract_full_metadata(video_id)
+            
+            # 자막 수집
+            subtitle_options = {
+                'output_dir': options.get('output_dir', self.config.output_dir),
+                'languages': options.get('languages', self.config.default_subtitle_languages),
+                'auto_subs': options.get('auto_subs', self.config.auto_subtitles)
+            }
+            
+            subtitle_result = subtitle_manager.collect_subtitles(video_id, subtitle_options)
+            
+            return {
+                'video_id': video_id,
+                'metadata': metadata,
+                'subtitles': subtitle_result,
+                'success': True
+            }
+            
+        except Exception as e:
+            self.logger.error(f"비디오 처리 오류: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+    
+    def extract_metadata_only(self, video_url: str) -> Dict[str, Any]:
+        """메타데이터만 추출"""
+        try:
+            video_id = YouTubeUtils.extract_video_id(video_url)
+            metadata_extractor = self.factory.create_metadata_extractor()
+            return metadata_extractor.extract_full_metadata(video_id)
+        except Exception as e:
+            self.logger.error(f"메타데이터 추출 오류: {e}")
+            raise
+    
+    def download_subtitles_only(self, video_url: str, options: Dict[str, Any] = None) -> Dict[str, Any]:
+        """자막만 다운로드"""
+        if options is None:
+            options = {}
+        
+        try:
+            video_id = YouTubeUtils.extract_video_id(video_url)
+            subtitle_manager = self.factory.create_subtitle_manager()
+            
+            subtitle_options = {
+                'output_dir': options.get('output_dir', self.config.output_dir),
+                'languages': options.get('languages', self.config.default_subtitle_languages),
+                'auto_subs': options.get('auto_subs', self.config.auto_subtitles)
+            }
+            
+            return subtitle_manager.collect_subtitles(video_id, subtitle_options)
+            
+        except Exception as e:
+            self.logger.error(f"자막 다운로드 오류: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }

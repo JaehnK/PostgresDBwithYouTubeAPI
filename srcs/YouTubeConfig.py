@@ -17,15 +17,21 @@ class YouTubeConfig:
     max_results_per_request: int = 50
     default_subtitle_languages: List[str] = field(default_factory=lambda: ['ko', 'en'])
     auto_subtitles: bool = True
+    api_count = 1
     
     def __post_init__(self):
         """설정 초기화 및 검증"""
         if not self.api_key:
             load_dotenv()   
-            self.api_key = os.getenv('YOUTUBE_API_KEY', '')
+            self.api_key = os.getenv('YOUTUBE_API_KEY' + str(self.api_count), '')
         
         # 출력 디렉토리 생성
         Path(self.output_dir).mkdir(parents=True, exist_ok=True)
+        
+    def _change_api(self):
+        load_dotenv()
+        self.api_count += 1
+        self.api_key = os.getenv('YOUTUBE_API_KEY' + str(self.api_count), '')
         
     def validate(self) -> bool:
         """설정 유효성 검증"""

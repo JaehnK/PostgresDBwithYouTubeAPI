@@ -125,6 +125,7 @@ class YouTubeAPIHandler:
                 raise ValueError(f"채널을 찾을 수 없습니다: {channel_id}")
             else:
                 raise Exception(f"API 호출 실패: {e}")
+            self.get_channel_info()
         except Exception as e:
             self.logger.error(f"채널 정보 조회 중 오류: {e}")
             raise

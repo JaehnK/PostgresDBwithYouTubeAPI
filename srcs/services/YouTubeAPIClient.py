@@ -1,7 +1,10 @@
 import time
 import logging
+import os
 from typing import Dict, List, Any
+import json
 
+from dotenv import load_dotenv
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
@@ -13,12 +16,18 @@ class YouTubeAPIClient(IYouTubeAPIClient):
     """YouTube API 클라이언트 구현"""
     
     def __init__(self, config: YouTubeConfig):
+        self.api_count = 1
         self.config = config
         self.youtube = build('youtube', 'v3', developerKey=config.api_key)
         self.quota_usage = 0
         self.last_call_time = 0
         self.logger = logging.getLogger(__name__)
-    
+        
+    def _reload_api(self):
+        self.api_count += 1
+        self.config._change_api()
+        self.youtube = build('youtube', 'v3', developerKey=self.config.api_key)
+        
     def _rate_limit(self):
         """API 호출 제한"""
         current_time = time.time()
@@ -57,8 +66,25 @@ class YouTubeAPIClient(IYouTubeAPIClient):
                 raise ValueError(f"비디오를 찾을 수 없습니다: {video_id}")
                 
         except HttpError as e:
-            self.logger.error(f"YouTube API 오류: {e}")
-            raise
+            
+        # 에러 상세 정보 파싱
+            error_details = json.loads(e.content.decode('utf-8'))
+            error_reason = error_details.get('error', {}).get('errors', [{}])[0].get('reason', '')
+            if e.resp.status == 403:
+                if error_reason == 'quotaExceeded':
+                    print("API 할당량이 초과되었습니다. 재갱신 하겠습니다.")
+                    # quota exceeded 전용 처리 로직
+                elif error_reason == 'forbidden':
+                    print("접근이 금지되었습니다.")
+                else:
+                    print(f"403 에러 (다른 원인): {error_reason}")
+            else:
+                print(f"다른 HTTP 에러: {e.resp.status}, {error_reason}")
+                self._reload_api()
+                return self.get_channel_info(video_id)
+        #except HttpError as e:
+        #    self.logger.error(f"YouTube API 오류: {e}")
+        #    raise
     
     def get_channel_info(self, channel_id: str, parts: List[str] = None) -> Dict[str, Any]:
         """채널 정보 조회 (핸들 지원)"""

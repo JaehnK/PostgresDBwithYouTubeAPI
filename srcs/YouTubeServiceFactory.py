@@ -1,6 +1,8 @@
 from .interfaces.ISubtitleDownloader import ISubtitleDownloader
 from .interfaces.ISubtitleProcessor import ISubtitleProcessor
 from .interfaces.IYouTubeAPIClient import IYouTubeAPIClient
+from .interfaces.ICommentCollector import ICommentCollector
+from .interfaces.IYouTubeDao import IYouTubeDao
 
 from .manager.VideoMetaDataExtractor import VideoMetadataExtractor
 from .manager.SubtitleManager import SubtitleManager
@@ -12,6 +14,7 @@ from .services.YTDLPDownLoader import YTDLPDownloader
 
 from .utils.YoutubeUtils import YouTubeUtils
 from .YouTubeConfig import YouTubeConfig
+from .dao.YouTubeDao import YouTubeDBSetup
 
 class YouTubeServiceFactory:
     """YouTube 서비스 팩토리"""
@@ -47,6 +50,10 @@ class YouTubeServiceFactory:
             processor = self.create_subtitle_processor()
         return SubtitleManager(downloader, processor, self.utils)
     
-    def create_comment_collector(self) -> YouTubeCommentCollector:
+    def create_comment_collector(self) -> ICommentCollector:
         """댓글 수집기 생성"""
         return YouTubeCommentCollector(self.config)
+    
+    def create_db_connector(self) -> IYouTubeDao:
+        """DB 접근자 생성"""
+        return YouTubeDBSetup()

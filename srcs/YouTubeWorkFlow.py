@@ -1,7 +1,12 @@
 from typing import Dict, Any
 import logging
+from pprint import pprint
 
+from googleapiclient.errors import HttpError
 from .utils.YoutubeUtils import YouTubeUtils
+
+import json
+from .dao.YouTubeDao import YouTubeDBSetup
 
 from .YouTubeConfig import YouTubeConfig
 from .YouTubeServiceFactory import YouTubeServiceFactory
@@ -26,6 +31,7 @@ class YouTubeWorkflow:
             # 서비스 생성
             metadata_extractor = self.factory.create_metadata_extractor()
             subtitle_manager = self.factory.create_subtitle_manager()
+            db_connector = self.factory.create_db_connector()
             
             # 메타데이터 추출 
             metadata = metadata_extractor.extract_full_metadata(video_id)
@@ -38,18 +44,21 @@ class YouTubeWorkflow:
             }
             subtitle_result = subtitle_manager.collect_subtitles(video_id, subtitle_options)
             
+            #pprint(subtitle_result)
+            metadata['script_timestamp'] = subtitle_result['timestamp_files'][0]
+            metadata['script'] = subtitle_result['text_files']
+            db_connector.save_video_data(metadata)
             results = {
                 'video_id': video_id,
                 'metadata': metadata,
-                'subtitles': subtitle_result,
+                #'subtitles': subtitle_result,
                 'success': True
             }
             
             # 댓글 기능 (옵션으로만 실행)
-            if options.get('include_comments', False):
+            if options.get('include_comments', True):
                 comment_collector = self.factory.create_comment_collector()
                 all_comments = comment_collector.collect_complete_comments(video_id)
-                print(all_comments)
                 
                 # 분석 및 결과 구성
                 results['comments'] = {
@@ -58,10 +67,30 @@ class YouTubeWorkflow:
                     'quota_used': comment_collector.quota_usage
                 }
                 
-                if options.get('include_raw_comments', False):
+                if options.get('include_raw_comments', True):
                     results['comments']['raw_comments'] = all_comments
-            
+                for coms in results['comments']['raw_comments']:
+                    db_connector.save_comment_data(coms)
                 return results
+            
+        except HttpError as e:
+            
+        # 에러 상세 정보 파싱
+            error_details = json.loads(e.content.decode('utf-8'))
+            error_reason = error_details.get('error', {}).get('errors', [{}])[0].get('reason', '')
+            if e.resp.status == 403:
+                if error_reason == 'quotaExceeded':
+                    print("API 할당량이 초과되었습니다. 재갱신 하겠습니다.")
+                    self.config._change_api()
+                    self.factory = YouTubeServiceFactory(self.config)
+                    return self.process_single_video(video_url, options)
+                    # quota exceeded 전용 처리 로직
+                elif error_reason == 'forbidden':
+                    print("접근이 금지되었습니다.")
+                else:
+                    print(f"403 에러 (다른 원인): {error_reason}")
+            else:
+                print(f"다른 HTTP 에러: {e.resp.status}, {error_reason}")
                 
         except Exception as e:
                 self.logger.error(f"비디오 처리 오류: {e}")

@@ -47,8 +47,8 @@ class YouTubeUtils:
     def generate_urls(video_id: str) -> Dict[str, str]:
         """비디오 ID로부터 관련 URL 생성"""
         return {
-            'video_url': f"https://www.youtube.com/watch?v={video_id}",
-            'short_url': f"https://youtu.be/{video_id}",
-            'embed_url': f"https://www.youtube.com/embed/{video_id}",
-            'thumbnail_maxres': f"https://img.youtube.com/vi/{video_id}/maxresdefault.jpg",
+            #'video_url': f"https://www.youtube.com/watch?v={video_id}",
+            #'short_url': f"https://youtu.be/{video_id}",
+            #'embed_url': f"https://www.youtube.com/embed/{video_id}",
+            'thumbnail_maxres': f"https://img.youtube.com/vi/{video_id}/maxresdefault.jpg"
         }

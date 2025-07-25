@@ -18,12 +18,16 @@ class YouTubeConfig:
     default_subtitle_languages: List[str] = field(default_factory=lambda: ['ko', 'en'])
     auto_subtitles: bool = True
     api_count = 1
+    cookies_path: str = None
     
     def __post_init__(self):
         """설정 초기화 및 검증"""
+        load_dotenv()   
         if not self.api_key:
-            load_dotenv()   
             self.api_key = os.getenv('YOUTUBE_API_KEY' + str(self.api_count), '')
+            
+        if not self.cookies_path:
+            self.cookies_path = os.getenv("YOUTUBE_COOKIES")
         
         # 출력 디렉토리 생성
         Path(self.output_dir).mkdir(parents=True, exist_ok=True)

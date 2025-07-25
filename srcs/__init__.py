@@ -9,7 +9,6 @@ from .manager.VideoMetaDataExtractor import VideoMetadataExtractor
 from .manager.SubtitleManager import SubtitleManager
 from .utils.YoutubeUtils import YouTubeUtils
 from .dao.YouTubeDao import YouTubeDBSetup
-from .dao.YouTubeDao import YouTubeDataSaver
 from .YouTubeConfig import YouTubeConfig
 from .YouTubeServiceFactory import YouTubeServiceFactory
 from .YouTubeWorkFlow import YouTubeWorkflow 
@@ -24,8 +23,7 @@ __all__ = [
     'VideoMetadataExtractor',
     'SubtitleManager',           
     'YouTubeUtils', 
-    'YouTubeDBSetup', 
-    'YouTubeDataSaver',
+    'YouTubeDBSetup',
     'YouTubeConfig', 
     'YouTubeServiceFactory',      
     'YouTubeWorkflow'

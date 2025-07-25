@@ -31,7 +31,7 @@ class VideoMetadataExtractor:
                 'like_count': int(video_data['statistics'].get('likeCount', 0)),
                 'comment_count': int(video_data['statistics'].get('commentCount', 0)),
                 'duration_iso': video_data['contentDetails']['duration'],
-                'definition': video_data['contentDetails']['definition'],
+                #'definition': video_data['contentDetails']['definition'],
                 'caption': video_data['contentDetails']['caption'],
             }
             

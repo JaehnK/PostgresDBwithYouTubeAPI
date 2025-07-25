@@ -19,7 +19,7 @@ class SubtitleManager:
         try:
             # 1. 자막 다운로드
             download_success = self.downloader.download_subtitles(video_id, options)
-            
+            print("Script Download: ", download_success)
             if not download_success:
                 return {
                     'success': False,
@@ -42,8 +42,8 @@ class SubtitleManager:
             
             return {
                 'success': True,
-                'timestamp_files': list(timestamp_dir.glob(f"{video_id}*.srt")),
-                'text_files': processed_files
+                'timestamp_files': [str(file) for file in timestamp_dir.glob(f"{video_id}*.srt")],
+                'text_files': processed_files[0]
             }
             
         except Exception as e:

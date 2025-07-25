@@ -5,6 +5,7 @@ from .interfaces.ICommentCollector import ICommentCollector
 from .interfaces.IYouTubeDao import IYouTubeDao
 
 from .manager.VideoMetaDataExtractor import VideoMetadataExtractor
+from .manager.ChannelMetadataExtractor import ChannelMetadataExtractor
 from .manager.SubtitleManager import SubtitleManager
 
 from .services.YouTubeCommentCollector import YouTubeCommentCollector
@@ -57,3 +58,9 @@ class YouTubeServiceFactory:
     def create_db_connector(self) -> IYouTubeDao:
         """DB 접근자 생성"""
         return YouTubeDBSetup()
+    
+    def create_channel_metadata_extractor(self, api_client: IYouTubeAPIClient = None) -> 'ChannelMetadataExtractor':
+        """채널 메타데이터 추출기 생성"""
+        if api_client is None:
+            api_client = self.create_api_client()
+        return ChannelMetadataExtractor(api_client)

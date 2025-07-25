@@ -11,6 +11,9 @@ from .dao.YouTubeDao import YouTubeDBSetup
 from .YouTubeConfig import YouTubeConfig
 from .YouTubeServiceFactory import YouTubeServiceFactory
 
+from .services.YouTubeAPIClient import YouTubeAPIClient
+
+
 class YouTubeWorkflow:
     """YouTube 작업 워크플로우 관리"""
     
@@ -132,3 +135,17 @@ class YouTubeWorkflow:
                 'success': False,
                 'error': str(e)
             }
+            
+    def process_channel_information(self, channel_handler: str, options: Dict[str, Any] = None) -> Dict[str, Any]:
+        
+        channel_extractor = self.factory.create_channel_metadata_extractor()
+        channel_data = channel_extractor.get_channel_data(channel_handler)
+        pprint(channel_data)
+
+        results = {
+                'channel_handler': channel_handler,
+                'metadata': channel_data,
+                'success': True
+            }
+        
+        return results

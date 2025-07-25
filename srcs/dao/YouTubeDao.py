@@ -413,6 +413,41 @@ class YouTubeDBSetup:
                 cursor.close()
             if connection:
                 connection.close()
+                
+    def get_unique_channel_ids(self):
+        """videos 테이블에서 중복 없는 channel_id 목록 조회"""
+        connection = self.get_connection()
+        if not connection:
+            return None
+        
+        try:
+            cursor = connection.cursor()
+            
+            # 중복 없는 channel_id 조회
+            cursor.execute("""
+                SELECT DISTINCT channel_id 
+                FROM videos 
+                WHERE channel_id IS NOT NULL
+                ORDER BY channel_id;
+            """)
+            
+            results = cursor.fetchall()
+            
+            # 튜플을 리스트로 변환
+            channel_ids = [row[0] for row in results]
+            
+            print(f"📋 고유 채널 ID: {len(channel_ids):,}개")
+            
+            return channel_ids
+            
+        except Exception as e:
+            print(f"❌ 채널 ID 조회 실패: {e}")
+            return None
+        finally:
+            if cursor:
+                cursor.close()
+            if connection:
+                connection.close()
         
 # 사용 예시
 if __name__ == "__main__":

@@ -34,6 +34,9 @@ def main():
     'save_comments_to_file': True,
     'include_raw_comments' : True
     })
+    
+    channel_ids = database.get_unique_channel_ids()
+    pprint(channel_ids)
 # 메타데이터 + 자막 + 댓글 모두 처리
     #pprint(result)
         

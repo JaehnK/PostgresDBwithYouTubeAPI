@@ -15,7 +15,7 @@ class YouTubeWorkflow:
         self.logger = logging.getLogger(__name__)
     
     def process_single_video(self, video_url: str, options: Dict[str, Any] = None) -> Dict[str, Any]:
-        """단일 비디오 전체 처리"""
+        """단일 비디오 전체 처리 (댓글 기능 추가)"""
         if options is None:
             options = {}
         
@@ -27,7 +27,7 @@ class YouTubeWorkflow:
             metadata_extractor = self.factory.create_metadata_extractor()
             subtitle_manager = self.factory.create_subtitle_manager()
             
-            # 메타데이터 추출
+            # 메타데이터 추출 
             metadata = metadata_extractor.extract_full_metadata(video_id)
             
             # 자막 수집
@@ -36,22 +36,39 @@ class YouTubeWorkflow:
                 'languages': options.get('languages', self.config.default_subtitle_languages),
                 'auto_subs': options.get('auto_subs', self.config.auto_subtitles)
             }
-            
             subtitle_result = subtitle_manager.collect_subtitles(video_id, subtitle_options)
             
-            return {
+            results = {
                 'video_id': video_id,
                 'metadata': metadata,
                 'subtitles': subtitle_result,
                 'success': True
             }
             
+            # 댓글 기능 (옵션으로만 실행)
+            if options.get('include_comments', False):
+                comment_collector = self.factory.create_comment_collector()
+                all_comments = comment_collector.collect_complete_comments(video_id)
+                print(all_comments)
+                
+                # 분석 및 결과 구성
+                results['comments'] = {
+                    'total_comments': len(all_comments),
+                    'structure_analysis': comment_collector.analyze_comment_structure(all_comments),
+                    'quota_used': comment_collector.quota_usage
+                }
+                
+                if options.get('include_raw_comments', False):
+                    results['comments']['raw_comments'] = all_comments
+            
+                return results
+                
         except Exception as e:
-            self.logger.error(f"비디오 처리 오류: {e}")
-            return {
-                'success': False,
-                'error': str(e)
-            }
+                self.logger.error(f"비디오 처리 오류: {e}")
+                return {
+                    'success': False,
+                    'error': str(e)
+                }
     
     def extract_metadata_only(self, video_url: str) -> Dict[str, Any]:
         """메타데이터만 추출"""

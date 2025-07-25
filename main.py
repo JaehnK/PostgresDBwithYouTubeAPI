@@ -22,8 +22,14 @@ def main():
         default_subtitle_languages=['ko']
     )
     workflow = srcs.YouTubeWorkflow(config)    
+    
     video_url = "https://www.youtube.com/watch?v=QH1MQ9OajwY"
-    result = workflow.process_single_video(video_url)
+    
+    result = workflow.process_single_video(video_url, {
+    'include_comments': True,      # 댓글 포함
+    'save_comments_to_file': True
+    })
+# 메타데이터 + 자막 + 댓글 모두 처리
     pprint(result)
         
 if __name__ == "__main__":

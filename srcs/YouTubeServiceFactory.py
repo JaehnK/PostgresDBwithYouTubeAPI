@@ -5,10 +5,10 @@ from .interfaces.IYouTubeAPIClient import IYouTubeAPIClient
 from .manager.VideoMetaDataExtractor import VideoMetadataExtractor
 from .manager.SubtitleManager import SubtitleManager
 
+from .services.YouTubeCommentCollector import YouTubeCommentCollector
 from .services.SubtitleProcessor import SubtitleProcessor
 from .services.YouTubeAPIClient import YouTubeAPIClient
 from .services.YTDLPDownLoader import YTDLPDownloader
-from .services.YouTubeCommentCollector import YouTubeCommentCollector
 
 from .utils.YoutubeUtils import YouTubeUtils
 from .YouTubeConfig import YouTubeConfig

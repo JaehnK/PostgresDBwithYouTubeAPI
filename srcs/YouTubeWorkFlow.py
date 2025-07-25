@@ -140,7 +140,8 @@ class YouTubeWorkflow:
         
         channel_extractor = self.factory.create_channel_metadata_extractor()
         channel_data = channel_extractor.get_channel_data(channel_handler)
-        pprint(channel_data)
+        database = self.factory.create_db_connector()
+        database.save_channel_data(channel_data)
 
         results = {
                 'channel_handler': channel_handler,

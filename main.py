@@ -36,7 +36,8 @@ def main():
     })
     
     channel_ids = database.get_unique_channel_ids()
-    pprint(channel_ids)
+    for i in channel_ids:
+        workflow.process_channel_information(i)
 # 메타데이터 + 자막 + 댓글 모두 처리
     #pprint(result)
         

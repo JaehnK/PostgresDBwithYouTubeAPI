@@ -8,6 +8,7 @@ from .manager.SubtitleManager import SubtitleManager
 from .services.SubtitleProcessor import SubtitleProcessor
 from .services.YouTubeAPIClient import YouTubeAPIClient
 from .services.YTDLPDownLoader import YTDLPDownloader
+from .services.YouTubeCommentCollector import YouTubeCommentCollector
 
 from .utils.YoutubeUtils import YouTubeUtils
 from .YouTubeConfig import YouTubeConfig
@@ -45,3 +46,7 @@ class YouTubeServiceFactory:
         if processor is None:
             processor = self.create_subtitle_processor()
         return SubtitleManager(downloader, processor, self.utils)
+    
+    def create_comment_collector(self) -> YouTubeCommentCollector:
+        """댓글 수집기 생성"""
+        return YouTubeCommentCollector(self.config)

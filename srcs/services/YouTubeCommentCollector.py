@@ -10,19 +10,8 @@ from dotenv import load_dotenv
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-# ==================== 댓글 수집기 인터페이스 ====================
-class ICommentCollector(ABC):
-    """댓글 수집기 인터페이스"""
-    
-    @abstractmethod
-    def collect_all_comments(self, video_id: str) -> List[Dict[str, Any]]:
-        """모든 댓글과 대댓글을 완전히 수집 (무제한)"""
-        pass
-    
-    @abstractmethod
-    def analyze_comment_structure(self, comments: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """댓글 구조 분석"""
-        pass
+from ..YouTubeConfig import YouTubeConfig
+from ..interfaces import ICommentCollector
 
 
 # ==================== 무제한 댓글 수집기 구현 ====================

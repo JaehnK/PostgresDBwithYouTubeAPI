@@ -449,6 +449,110 @@ class YouTubeDBSetup:
             if connection:
                 connection.close()
         
+    def get_comments_by_video_id(self, video_id):
+        """특정 video_id에 대한 댓글 조회"""
+        connection = self.get_connection()
+        if not connection:
+            return None
+        
+        try:
+            cursor = connection.cursor()
+            
+            # video_id에 해당하는 댓글 조회
+            cursor.execute("""
+                SELECT * 
+                FROM comments 
+                WHERE video_id = %s
+                ORDER BY published_at DESC;
+            """, (video_id,))
+            
+            results = cursor.fetchall()
+            
+            # 결과를 딕셔너리 형태로 변환
+            comments = []
+            for row in results:
+                comment = {
+                    'comment_id': row[0],
+                    'video_id': row[1],
+                    'author': row[2],
+                    'author_channel_id': row[3],
+                    'comment_text': row[4],
+                    'like_count': row[5],
+                    'published_at': row[6],
+                    'updated_at': row[7],
+                    'reply_count': row[8],
+                    'is_reply': row[9],
+                    'parent_id': row[10],
+                    'collection_time': row[11]
+                }
+                comments.append(comment)
+            
+            print(f"📋 {len(comments):,}개의 댓글 조회 완료!")
+            return comments
+            
+        except Exception as e:
+            print(f"❌ 댓글 조회 실패: {e}")
+            return None
+        finally:
+            if cursor:
+                cursor.close()
+            if connection:
+                connection.close()
+        
+    def get_video_metadata(self, video_id):
+        """특정 video_id에 대한 메타데이터 조회"""
+        connection = self.get_connection()
+        if not connection:
+            return None
+        
+        try:
+            cursor = connection.cursor()
+            
+            # video_id에 해당하는 메타데이터 조회
+            cursor.execute("""
+                SELECT * 
+                FROM videos 
+                WHERE video_id = %s;
+            """, (video_id,))
+            
+            result = cursor.fetchone()
+            
+            if result:
+                metadata = {
+                    'video_id': result[0],
+                    'title': result[1],
+                    'channel_title': result[2],
+                    'channel_id': result[3],
+                    'published_at': result[4],
+                    'category_id': result[5],
+                    'view_count': result[6],
+                    'like_count': result[7],
+                    'comment_count': result[8],
+                    'duration_formatted': result[9],
+                    'tags': result[10],
+                    'script': result[11],
+                    'script_timestamp': result[12],
+                    'description': result[13],
+                    'like_ratio': result[14],
+                    'engagement_rate': result[15],
+                    'thumbnail_maxres': result[16]
+                }
+                
+                print(f"📋 {video_id}에 대한 메타데이터 조회 완료!")
+                return metadata
+            else:
+                print(f"❌ {video_id}에 대한 메타데이터가 없습니다.")
+                return None
+            
+        except Exception as e:
+            print(f"❌ 메타데이터 조회 실패: {e}")
+            return None
+        finally:
+            if cursor:
+                cursor.close()
+            if connection:
+                connection.close()
+
 # 사용 예시
 if __name__ == "__main__":
     

@@ -27,7 +27,7 @@ def main():
     workflow = srcs.YouTubeWorkflow(config)
     
     
-    video_url = "https://www.youtube.com/watch?v=ZAsBykWi0bc8"
+    video_url = "https://www.youtube.com/watch?v=cWtngWBBDXM"
     
     result = workflow.process_single_video(video_url, {
     'include_comments': True,      # 댓글 포함
